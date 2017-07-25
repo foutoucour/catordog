@@ -1,0 +1,17 @@
+---
+- name: server setup
+  hosts: "{{ db }}"
+  vars:
+    postgres_version: 9.5
+  roles:
+    - postgresql
+
+- name: webapp
+  hosts: "{{ webapp }}"
+  vars:
+    pip_version: 9.0.1
+    python_version: 3
+    webapp_name: catordog
+  roles:
+#    - apache2
+    - flask

@@ -1,0 +1,5 @@
+---
+- name: restart catordog
+  remote_user: root
+  become: yes
+  service: name=catordog state=restarted

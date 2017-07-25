@@ -1,0 +1,14 @@
+---
+- name: package update
+  remote_user: root
+  become: yes
+  package:
+    update_cache: "yes"
+    cache_valid_time: 86400  # One day
+
+- name: install postgresql {{ postgres_version }}
+  remote_user: root
+  become: yes
+  package: name={{item}} state=latest
+  with_items:
+    - postgresql-{{ postgres_version }}

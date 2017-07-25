@@ -1,0 +1,66 @@
+---
+- name: package update
+  remote_user: root
+  become: yes
+  package:
+    update_cache: "yes"
+    cache_valid_time: 86400  # One day
+
+- name: python3
+  remote_user: root
+  become: yes
+  package: name={{item}} state=latest
+  with_items:
+    - python{{ python_version }}
+    - python{{ python_version }}-pip
+    - python{{ python_version }}-venv
+    - ipython{{ python_version }}
+
+- name: pip{{ python_version }} upgrade to {{ pip_version }}
+  remote_user: root
+  become: yes
+  pip:
+    name: pip
+    executable: pip{{ python_version }}
+    version: "{{ pip_version }}"
+
+- name: Creates directory
+  remote_user: root
+  become: yes
+  file:
+    recurse: yes
+    path: "/opt/{{ webapp_name}}"
+    state: directory
+
+- name: install webapp
+  remote_user: root
+  become: yes
+  copy:
+    src:  "{{ webapp_name }}"
+    dest: /opt
+
+- name: install service
+  remote_user: root
+  become: yes
+  copy:
+    src:  roles/flask/catordog.service
+    dest: /etc/systemd/system/
+  notify:
+    - restart catordog
+
+- name: install venv
+  remote_user: root
+  become: yes
+  pip:
+    requirements: "/opt/{{ webapp_name }}/requirements.txt"
+    virtualenv: "/opt/{{ webapp_name }}/venv"
+    virtualenv_command: /usr/bin/python3 -m venv
+  notify:
+    - restart catordog
+
+- name: started service
+  remote_user: root
+  become: yes
+  service:
+    name: catordog
+    state: started
