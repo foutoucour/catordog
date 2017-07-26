@@ -1,0 +1,32 @@
+---
+- name: EC2
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: ec2 catordog instance
+      ec2_remote_facts:
+        region: us-east-2
+        filters:
+          instance-state-name: running
+          "tag:Name": catordog
+      register: ec2
+
+    - add_host:
+        groups: catordog_ec2
+        hostname: "{{ item.id }}"
+        ansible_host: "{{ item.public_dns_name }}"
+        ansible_user: ubuntu
+      with_items:
+        - "{{ ec2.instances }}"
+
+
+- name: webapp
+  hosts: catordog_ec2
+  remote_user: ubuntu
+  become: yes
+  vars:
+    pip_version: 9.0.1
+    python_version: 3
+    webapp_name: catordog
+  roles:
+    - flask

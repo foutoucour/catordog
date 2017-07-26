@@ -5,7 +5,7 @@ After=network.target
 [Service]
 WorkingDirectory=/opt/catordog/
 Environment="PATH=/opt/catordog/venv/bin"
-ExecStart=/opt/catordog/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 app:app
+ExecStart=/opt/catordog/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:80 app:app
 
 [Install]
 WantedBy=multi-user.target

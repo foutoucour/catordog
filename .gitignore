@@ -18,4 +18,4 @@ pip-delete-this-directory.txt
 # Backup files
 *~
 *.swp
-
+*.pem

@@ -39,15 +39,6 @@
     src:  "{{ webapp_name }}"
     dest: /opt
 
-- name: install service
-  remote_user: root
-  become: yes
-  copy:
-    src:  roles/flask/catordog.service
-    dest: /etc/systemd/system/
-  notify:
-    - restart catordog
-
 - name: install venv
   remote_user: root
   become: yes
@@ -55,6 +46,15 @@
     requirements: "/opt/{{ webapp_name }}/requirements.txt"
     virtualenv: "/opt/{{ webapp_name }}/venv"
     virtualenv_command: /usr/bin/python3 -m venv
+  notify:
+    - restart catordog
+
+- name: install service
+  remote_user: root
+  become: yes
+  copy:
+    src:  roles/flask/files/catordog.service
+    dest: /etc/systemd/system/
   notify:
     - restart catordog
 
