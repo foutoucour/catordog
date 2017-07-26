@@ -3,30 +3,48 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: ec2 catordog instance
+    - name: Find EC2 webapps instances
       ec2_remote_facts:
         region: us-east-2
         filters:
           instance-state-name: running
-          "tag:Name": catordog
-      register: ec2
+          "tag:catordog_type": webapp
+      register: webapps
 
-    - add_host:
-        groups: catordog_ec2
-        hostname: "{{ item.id }}"
+    - name: Add EC2 webapps
+      add_host:
+        groups: webapps
+        hostname: "webapp_{{ item.id }}"
         ansible_host: "{{ item.public_dns_name }}"
         ansible_user: ubuntu
       with_items:
-        - "{{ ec2.instances }}"
+        - "{{ webapps.instances }}"
+
+    - name: Find RDS instance
+      rds:
+        region: us-east-2
+        command: facts
+        instance_name: catordogdb
+      register: db
 
 
-- name: webapp
-  hosts: catordog_ec2
+    - debug:
+        msg: "{{ hostvars[groups['catordogdb'][0]] }}"
+
+- name: test
+  hosts: webapps
   remote_user: ubuntu
   become: yes
-  vars:
-    pip_version: 9.0.1
-    python_version: 3
-    webapp_name: catordog
-  roles:
-    - flask
+  tasks:
+    - debug:
+        msg: "{{ hostvars[groups['catordogdb'][0]] }}"
+#- name: webapp
+#  hosts: webapps
+#  remote_user: ubuntu
+#  become: yes
+#  vars:
+#    pip_version: 9.0.1
+#    python_version: 3
+#    webapp_name: catordog
+#  roles:
+#    - flask
