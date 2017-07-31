@@ -1,2 +1,7 @@
 Flask==0.12
 gunicorn==19.7
+flask_sqlalchemy==2.2
+flask-wtf==0.14
+flask_script==2.0.5
+flask_migrate==2.1
+psycopg2==2.7
