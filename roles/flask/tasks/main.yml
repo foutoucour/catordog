@@ -33,13 +33,9 @@
     state: directory
 
 - name: copy webapp code to /opt
-  remote_user: root
-  become: yes
-  git:
-
-#  copy:
-#    src:  "{{ webapp_name }}"
-#    dest: /opt
+  copy:
+    src:  "{{ webapp_name }}"
+    dest: /opt
 
 - name: install venv
   remote_user: root
@@ -71,6 +67,8 @@
   remote_user: root
   become: yes
   command: "python ./manage.py db init"
+  environment:
+    PATH: "/opt/{{ webapp_name }}/venv/bin"
   args:
     creates: "/opt/{{ webapp_name}}/migrations"
     chdir: "/opt/{{ webapp_name}}/"
