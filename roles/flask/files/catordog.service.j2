@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn instance to serve catordog
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/{{ webapp_name }}/
+Environment="PATH=/opt/{{ webapp_name }}/venv/bin"
+
+Environment="DB_USER={{ db_user }}"
+Environment="DB_PASSWORD={{ db_password }}"
+Environment="DB_NAME={{ db_name }}"
+Environment="DB_HOST={{ db_host }}"
+Environment="DB_PORT={{ db_port }}"
+
+
+ExecStart=/opt/catordog/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:80 app:app
+
+[Install]
+WantedBy=multi-user.target

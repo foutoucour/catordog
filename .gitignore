@@ -1,4 +1,4 @@
-__pycache__/
+/__pycache__/
 *.py[cod]
 *.pyc
 *.css.map
@@ -11,7 +11,7 @@ pip-delete-this-directory.txt
 
 # specific files
 # pycharm
-.idea
+/.idea
 # macos
 .DS_Store
 
@@ -19,3 +19,6 @@ pip-delete-this-directory.txt
 *~
 *.swp
 *.pem
+*.retry
+# Flask migrations
+migrations
