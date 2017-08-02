@@ -1,0 +1,17 @@
+---
+- name: Find EC2 webapps instances
+  ec2_remote_facts:
+    region: us-east-2
+    filters:
+      instance-state-name: running
+      "tag:catordog_type": webapp
+  register: webapps
+
+- name: Add EC2 webapps
+  add_host:
+    groups: webapps
+    hostname: "webapp_{{ item.public_dns_name }}"
+    ansible_host: "{{ item.public_dns_name }}"
+    ansible_user: ubuntu
+  with_items:
+    - "{{ webapps.instances }}"

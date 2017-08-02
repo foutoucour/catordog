@@ -1,0 +1,29 @@
+---
+- name: Gather facts about EC2 instances
+  hosts: localhost
+  connection: local
+  roles:
+    - ec2
+
+- name: Build the webapps
+  hosts: webapps
+  remote_user: ubuntu
+  become: yes
+  vars:
+    webapp_name: catordog
+    path: "/opt"
+    webapp_path: "{{ path }}/{{ webapp_name }}"
+
+    # number of workers on each webapp
+    gunicorn_workers: 3
+
+    python_version: 3
+    pip_version: 9.0.1
+
+    db_user: ormuco
+    db_password: "{{ db_password }}"
+    db_name: catordog
+    db_host: catordogdb.cdyunxcavvb1.us-east-2.rds.amazonaws.com
+    db_port: 5432
+  roles:
+    - flask

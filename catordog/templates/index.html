@@ -1,0 +1,20 @@
+{% extends "main_template.html" %}
+{% block content %}
+<form method="POST" action="/">
+    {{ form.csrf_token }}
+
+    <div class="form-check">
+        {{ form.name.label }} {{ form.name(size=20) }}
+    </div>
+    <div class="form-check">
+        {{ form.color.label }} {{ form.color(size=12, type="color") }}
+    </div>
+    <div class="form-check">
+        <label class="form-check-label">
+            {{ form.cat_or_dog.label }} {{ form.cat_or_dog() }}
+        </label>
+    </div>
+
+    <input type="submit" value="Go" class="btn btn-primary">
+</form>
+{% endblock %}

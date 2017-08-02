@@ -1,0 +1,93 @@
+---
+- name: package update
+  remote_user: root
+  become: yes
+  package:
+    update_cache: "yes"
+    cache_valid_time: 86400  # One day
+
+- name: python3
+  remote_user: root
+  become: yes
+  package: name={{item}} state=latest
+  with_items:
+    - python{{ python_version }}
+    - python{{ python_version }}-pip
+    - python{{ python_version }}-venv
+    - ipython{{ python_version }}
+
+- name: pip{{ python_version }} upgrade to {{ pip_version }}
+  remote_user: root
+  become: yes
+  pip:
+    name: pip
+    executable: pip{{ python_version }}
+    version: "{{ pip_version }}"
+
+- name: "Creates directory {{ webapp_path }}"
+  remote_user: root
+  become: yes
+  file:
+    recurse: yes
+    path: "{{ webapp_path }}"
+    state: directory
+
+- name: "copy webapp code to {{ path }}"
+  copy:
+    src:  "{{ webapp_name }}"
+    dest: "{{ path }}"
+
+- name: install venv
+  remote_user: root
+  become: yes
+  pip:
+    requirements: "{{ webapp_path }}/requirements.txt"
+    virtualenv: "{{ webapp_path }}/venv"
+    virtualenv_command: /usr/bin/python3 -m venv
+  notify:
+    - restart catordog
+
+- name: install service
+  remote_user: root
+  become: yes
+  template:
+    src:  roles/flask/files/catordog.service.j2
+    dest: /etc/systemd/system/catordog.service
+  notify:
+    - restart catordog
+
+- name: started service
+  remote_user: root
+  become: yes
+  service:
+    name: catordog
+    state: started
+
+- name: Init db migration
+  remote_user: root
+  become: yes
+  command: "python ./manage.py db init"
+  environment:
+    PATH: "{{ webapp_path }}/venv/bin"
+  args:
+    creates: "{{ webapp_path }}/migrations"
+    chdir: "{{ webapp_path }}/"
+  run_once: true
+
+- name: Upgrade db schema
+  remote_user: root
+  become: yes
+  command: "python ./manage.py db {{ item }}"
+  args:
+    chdir: "{{ webapp_path }}/"
+  environment:
+    PATH: "{{ webapp_path }}/venv/bin"
+    DB_USER: "{{ db_user }}"
+    DB_PASSWORD: "{{ db_password }}"
+    DB_NAME: "{{ db_name }}"
+    DB_HOST: "{{ db_host }}"
+    DB_PORT: "{{ db_port}}"
+  with_items:
+    - migrate
+    - upgrade
+  run_once: true
