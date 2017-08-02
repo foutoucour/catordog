@@ -1,3 +1,6 @@
+"""
+Definition of database models and form models.
+"""
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField
@@ -22,7 +25,7 @@ class MyForm(FlaskForm):
 class Result(db.Model):
     __tablename__ = 'results'
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     color = db.Column(db.String)
     cat_or_dog = db.Column(db.String)

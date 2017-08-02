@@ -24,25 +24,25 @@
     executable: pip{{ python_version }}
     version: "{{ pip_version }}"
 
-- name: Creates directory
+- name: "Creates directory {{ webapp_path }}"
   remote_user: root
   become: yes
   file:
     recurse: yes
-    path: "/opt/{{ webapp_name}}"
+    path: "{{ webapp_path }}"
     state: directory
 
-- name: copy webapp code to /opt
+- name: "copy webapp code to {{ path }}"
   copy:
     src:  "{{ webapp_name }}"
-    dest: /opt
+    dest: "{{ path }}"
 
 - name: install venv
   remote_user: root
   become: yes
   pip:
-    requirements: "/opt/{{ webapp_name }}/requirements.txt"
-    virtualenv: "/opt/{{ webapp_name }}/venv"
+    requirements: "{{ webapp_path }}/requirements.txt"
+    virtualenv: "{{ webapp_path }}/venv"
     virtualenv_command: /usr/bin/python3 -m venv
   notify:
     - restart catordog
@@ -68,10 +68,10 @@
   become: yes
   command: "python ./manage.py db init"
   environment:
-    PATH: "/opt/{{ webapp_name }}/venv/bin"
+    PATH: "{{ webapp_path }}/venv/bin"
   args:
-    creates: "/opt/{{ webapp_name}}/migrations"
-    chdir: "/opt/{{ webapp_name}}/"
+    creates: "{{ webapp_path }}/migrations"
+    chdir: "{{ webapp_path }}/"
   run_once: true
 
 - name: Upgrade db schema
@@ -79,9 +79,9 @@
   become: yes
   command: "python ./manage.py db {{ item }}"
   args:
-    chdir: "/opt/{{ webapp_name}}/"
+    chdir: "{{ webapp_path }}/"
   environment:
-    PATH: "/opt/{{ webapp_name }}/venv/bin"
+    PATH: "{{ webapp_path }}/venv/bin"
     DB_USER: "{{ db_user }}"
     DB_PASSWORD: "{{ db_password }}"
     DB_NAME: "{{ db_name }}"
