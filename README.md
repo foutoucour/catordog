@@ -1,4 +1,4 @@
-# Catordog: pick your side!
+# Catordog: pick your pet!
 
 Name your pet, pick a color and choice between cat or dog!
 
